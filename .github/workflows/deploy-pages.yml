@@ -40,18 +40,22 @@ jobs:
         working-directory: client
         env:
           VITE_BASE_PATH: /diamondsalonocala/
-        run: npm run build
+        run: npm run build --workspace client
+
+      - name: Verify build output
+        run: |
+          test -f client/client/dist/index.html
+          ls -la client/client/dist
 
       - name: Add SPA fallback
-        working-directory: client
         run: |
-          cp dist/index.html dist/404.html
-          touch dist/.nojekyll
+          cp client/client/dist/index.html client/client/dist/404.html
+          touch client/client/dist/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: client/dist
+          path: client/client/dist
 
   deploy:
     needs: build
