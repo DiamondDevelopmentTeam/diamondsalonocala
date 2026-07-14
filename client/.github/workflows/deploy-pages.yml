@@ -65,3 +65,20 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Build website
+        working-directory: client
+        env:
+          VITE_BASE_PATH: /diamondsalonocala/
+        run: npm run build --workspace client
+
+      - name: Add SPA fallback
+        working-directory: client
+        run: |
+          cp client/dist/index.html client/dist/404.html
+          touch client/dist/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: client/client/dist
