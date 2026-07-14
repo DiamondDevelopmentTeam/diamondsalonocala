@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: client/package-lock.json
 
       - name: Configure GitHub Pages
         id: pages
@@ -46,12 +47,15 @@ jobs:
           echo "VITE_API_URL=${{ vars.VITE_API_URL }}" >> "$GITHUB_ENV"
 
       - name: Install dependencies
+        working-directory: client
         run: npm ci
 
       - name: Build client
+        working-directory: client
         run: npm run build --workspace client
 
       - name: Add GitHub Pages SPA fallback
+        working-directory: client
         shell: bash
         run: |
           cp client/dist/index.html client/dist/404.html
@@ -60,7 +64,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: client/dist
+          path: client/client/dist
 
   deploy:
     environment:
