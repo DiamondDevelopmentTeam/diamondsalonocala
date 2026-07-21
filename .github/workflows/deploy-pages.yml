@@ -25,37 +25,40 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 22
           cache: npm
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
-        working-directory: client
         run: npm ci --no-audit --no-fund
 
-      - name: Build website
-        working-directory: client
+      - name: Validate website
+        run: |
+          npm run lint
+          npm run typecheck
+
+      - name: Build GitHub Pages site
         env:
           VITE_BASE_PATH: /diamondsalonocala/
-        run: npm run build --workspace client
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npm run build:pages
 
-      - name: Verify build output
+      - name: Verify Pages artifact
+        shell: bash
         run: |
-          test -f client/client/dist/index.html
-          ls -la client/client/dist
-
-      - name: Add SPA fallback
-        run: |
-          cp client/client/dist/index.html client/client/dist/404.html
-          touch client/client/dist/.nojekyll
+          test -f client/dist/index.html
+          test -f client/dist/404.html
+          test -f client/dist/.nojekyll
+          grep -q '/diamondsalonocala/assets/' client/dist/index.html
+          cmp --silent client/dist/index.html client/dist/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: client/client/dist
+          path: client/dist
 
   deploy:
     needs: build

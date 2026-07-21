@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PageHero } from '../components/PageHero';
 import { SubmitButton } from '../components/SubmitButton';
 import { getSalonForm } from '../data/forms';
-import { postJson } from '../lib/api';
+import { hasSubmissionApi, postJson } from '../lib/api';
 
 export function FormDetail() {
   const { slug = '' } = useParams();
@@ -23,8 +23,11 @@ export function FormDetail() {
     );
   }
 
+  const activeForm = formDefinition;
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!hasSubmissionApi) return;
     setStatus('pending');
     setMessage('');
 
@@ -32,8 +35,8 @@ export function FormDetail() {
     const form = new FormData(formElement);
     try {
       await postJson('/api/forms', {
-        formSlug: formDefinition.slug,
-        formTitle: formDefinition.title,
+        formSlug: activeForm.slug,
+        formTitle: activeForm.title,
         name: String(form.get('name') || ''),
         email: String(form.get('email') || ''),
         phone: String(form.get('phone') || ''),
@@ -54,10 +57,22 @@ export function FormDetail() {
 
   return (
     <>
-      <PageHero title={formDefinition.title} description={formDefinition.description} imageBase="contactimage" />
+      <PageHero
+        eyebrow="Secure client form"
+        title={activeForm.title}
+        description={activeForm.description}
+        imageBase="salon/ourspace8"
+        imageAlt="Quiet seating area at Diamond Salon Ocala"
+      />
       <section className="section section--cream">
         <div className="container narrow-container">
           <form className="salon-form" onSubmit={handleSubmit}>
+            {!hasSubmissionApi ? (
+              <div className="form-availability" role="note">
+                <strong>Online submission is not connected on this static preview.</strong>
+                <p>Please contact the salon to complete this form securely. Do not send sensitive health details by ordinary email.</p>
+              </div>
+            ) : null}
             <div className="form-grid-two">
               <label>
                 Full name
@@ -90,10 +105,10 @@ export function FormDetail() {
             </label>
             <label className="checkbox-field">
               <input name="consent" type="checkbox" required />
-              <span>{formDefinition.consentText}</span>
+              <span>{activeForm.consentText}</span>
             </label>
             <p className="form-disclaimer">Submitting this form sends the information to the salon. Do not include highly sensitive medical or financial information.</p>
-            <SubmitButton pending={status === 'pending'} label="Submit Form" />
+            <SubmitButton pending={status === 'pending'} disabled={!hasSubmissionApi} label="Submit form" />
             {message ? <p className={`form-status form-status--${status}`} role="status">{message}</p> : null}
           </form>
         </div>

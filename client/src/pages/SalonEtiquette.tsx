@@ -15,7 +15,7 @@ const policies = [
 export function SalonEtiquette() {
   return (
     <>
-      <PageHero title="Salon Etiquette" description="A few shared expectations help every guest enjoy a calm, professional visit." imageBase="ourspace8" />
+      <PageHero title="Salon etiquette." description="A few shared expectations help every guest enjoy a calm, professional visit." imageBase="salon/ourspace8" imageAlt="Quiet waiting area inside Diamond Salon Ocala" />
       <section className="section section--cream legal-page">
         <div className="container narrow-container">
           <p className="legal-intro">Diamond Salon Ocala strives to provide a relaxing, professional, and comfortable experience. Individual professionals may maintain additional booking and service policies.</p>

@@ -4,7 +4,7 @@ import { site } from '../config/site';
 export function PrivacyPolicy() {
   return (
     <>
-      <PageHero title="Privacy Policy" description="How information submitted through this website is handled." imageBase="ourspace1" />
+      <PageHero title="Privacy policy." description="How information submitted through this website is handled." imageBase="salon/ourspace1" imageAlt="Diamond Salon Ocala styling floor" />
       <section className="section section--cream legal-page">
         <div className="container narrow-container legal-copy">
           <p><strong>Last updated:</strong> July 2026</p>
@@ -26,7 +26,6 @@ export function PrivacyPolicy() {
           <p>This website is not directed to children under 13, and the salon does not knowingly collect personal information from children through the website without appropriate adult involvement.</p>
           <h2>Contact</h2>
           <p>Questions about this policy may be sent to <a href={`mailto:${site.secondaryEmail}`}>{site.secondaryEmail}</a> or discussed by calling <a href={site.phoneHref}>{site.phoneDisplay}</a>.</p>
-          <p className="legal-template-note">This policy is a practical website template and should be reviewed by the salon’s legal or compliance advisor before production launch.</p>
         </div>
       </section>
     </>

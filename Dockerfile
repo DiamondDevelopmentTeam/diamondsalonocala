@@ -7,7 +7,7 @@ COPY server/package*.json ./server/
 RUN npm install
 
 COPY . .
-RUN npm run build
+RUN VITE_BASE_PATH=/ VITE_ENABLE_SAME_ORIGIN_API=true npm run build
 
 FROM node:22-alpine AS runtime
 WORKDIR /app

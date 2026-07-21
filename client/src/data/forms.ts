@@ -36,6 +36,12 @@ export const salonForms: SalonFormDefinition[] = [
     description: 'Informed consent for facial treatments, exfoliation, extractions, and recommended aftercare.',
     consentText: 'I consent to the facial treatment and understand the recommended preparation and aftercare.',
   },
+  {
+    slug: 'skin-analysis-and-history',
+    title: 'Skin Analysis & History Form',
+    description: 'Skin concerns, treatment history, routines, sensitivities, and goals for a more informed consultation.',
+    consentText: 'I confirm that the skin history and product information I provided is complete and accurate.',
+  },
 ];
 
 export const getSalonForm = (slug: string) => salonForms.find((form) => form.slug === slug);

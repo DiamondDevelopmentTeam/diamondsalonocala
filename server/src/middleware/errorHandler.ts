@@ -1,7 +1,8 @@
 import type { ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
 
-export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
+export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
+  void next;
   const requestId = String(res.locals.requestId || 'unknown');
 
   if (error instanceof ZodError) {

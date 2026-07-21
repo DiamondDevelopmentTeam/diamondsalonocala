@@ -4,7 +4,7 @@ import { site } from '../config/site';
 export function Terms() {
   return (
     <>
-      <PageHero title="Terms & Conditions" description="Website use, service information, and booking expectations." imageBase="ourspace5" />
+      <PageHero title="Terms & conditions." description="Website use, service information, and booking expectations." imageBase="salon/ourspace5" imageAlt="Open interior of Diamond Salon Ocala" />
       <section className="section section--cream legal-page">
         <div className="container narrow-container legal-copy">
           <p><strong>Last updated:</strong> July 2026</p>
@@ -22,7 +22,6 @@ export function Terms() {
           <p>Do not misuse the website, attempt unauthorized access, submit unlawful or abusive content, interfere with operation, or impersonate another person.</p>
           <h2>Contact</h2>
           <p>Questions may be sent to <a href={`mailto:${site.secondaryEmail}`}>{site.secondaryEmail}</a>.</p>
-          <p className="legal-template-note">These terms are a starter template and should be reviewed by the salon’s legal advisor before production launch.</p>
         </div>
       </section>
     </>

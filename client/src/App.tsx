@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Contact } from './pages/Contact';
 import { FormDetail } from './pages/FormDetail';
@@ -33,6 +33,7 @@ export default function App() {
           <Route path="salon-etiquette" element={<SalonEtiquette />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="terms" element={<Terms />} />
+          <Route path="terms-conditions" element={<Navigate to="/terms" replace />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
