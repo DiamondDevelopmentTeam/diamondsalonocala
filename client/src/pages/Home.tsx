@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveImage } from '../components/ResponsiveImage';
 import { Reveal } from '../components/Reveal';
@@ -26,6 +26,22 @@ const featuredGallery = [galleryImages[0], galleryImages[2], galleryImages[3], g
 
 export function Home() {
   const heroMediaRef = useRef<HTMLDivElement>(null);
+  const serviceTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [activeService, setActiveService] = useState(0);
+
+  const selectServiceFromKeyboard = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex = index;
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (index + 1) % serviceHighlights.length;
+    else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (index - 1 + serviceHighlights.length) % serviceHighlights.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = serviceHighlights.length - 1;
+    else return;
+
+    event.preventDefault();
+    setActiveService(nextIndex);
+    serviceTabRefs.current[nextIndex]?.focus();
+  };
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -106,15 +122,46 @@ export function Home() {
             <p>Services are provided by independent professionals, so exact offerings, prices, and booking details may vary by specialist.</p>
           </Reveal>
 
-          <div className="service-index__grid">
-            {serviceHighlights.map((service, index) => (
-              <Reveal key={service.title} className="service-index__reveal" delay={index * 60}>
-                <article className="service-index__item">
+          <div className="service-tabs">
+            <div className="service-tabs__list" role="tablist" aria-label="Service categories">
+              {serviceHighlights.map((service, index) => (
+                <button
+                  key={service.title}
+                  ref={(element) => { serviceTabRefs.current[index] = element; }}
+                  id={`home-service-tab-${index}`}
+                  className="service-tabs__tab"
+                  type="button"
+                  role="tab"
+                  aria-selected={activeService === index}
+                  aria-controls={`home-service-panel-${index}`}
+                  tabIndex={activeService === index ? 0 : -1}
+                  onClick={() => setActiveService(index)}
+                  onKeyDown={(event) => selectServiceFromKeyboard(event, index)}
+                >
                   <span>{service.number}</span>
                   <h3>{service.title}</h3>
-                  <p>{service.copy}</p>
-                </article>
-              </Reveal>
+                </button>
+              ))}
+            </div>
+
+            {serviceHighlights.map((service, index) => (
+              <div
+                id={`home-service-panel-${index}`}
+                className="service-tabs__panel"
+                role="tabpanel"
+                aria-labelledby={`home-service-tab-${index}`}
+                tabIndex={0}
+                hidden={activeService !== index}
+                key={service.title}
+              >
+                <div className="service-tabs__panel-inner">
+                  <span aria-hidden="true">{service.number}</span>
+                  <div>
+                    <h3>{service.title}</h3>
+                    <p>{service.copy}</p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
           <Reveal className="centered-action"><Link className="button button--line-light" to="/services">View services &amp; pricing</Link></Reveal>

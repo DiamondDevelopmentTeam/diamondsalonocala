@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PageHero } from '../components/PageHero';
 import { ResponsiveImage } from '../components/ResponsiveImage';
-import { Reveal } from '../components/Reveal';
 import { site } from '../config/site';
 import { serviceGroups } from '../data/services';
 import { assetUrl } from '../lib/assets';
@@ -18,6 +17,7 @@ export function Services() {
         imageBase="salon/serviceImage"
         imageAlt="Styling station and salon chair at Diamond Salon Ocala"
         imagePosition="50% 58%"
+        className="page-hero--compact"
       />
 
       <section className="service-nav" aria-label="Service categories">
@@ -28,38 +28,36 @@ export function Services() {
 
       <section className="section services-section">
         <div className="container services-intro">
-          <Reveal>
+          <div>
             <p className="eyebrow eyebrow--dark">The menu</p>
             <h2>Start with a service.<br />Finish with a consultation.</h2>
-          </Reveal>
-          <Reveal delay={80}>
+          </div>
+          <div>
             <p className="large-copy">All prices shown are starting points. Your final quote may vary by professional, hair length and density, technique, timing, and product used. Confirm details before your appointment.</p>
-          </Reveal>
+          </div>
         </div>
 
         <div className="container services-layout">
           <div className="services-list">
             {serviceGroups.map((group, index) => (
-              <Reveal key={group.title} delay={(index % 2) * 60}>
-                <article className="service-group" id={slug(group.title)}>
-                  <header className="service-group__heading">
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <div>
-                      <h2>{group.title}</h2>
-                      {group.note ? <p>{group.note}</p> : null}
-                    </div>
-                  </header>
-                  <div className="price-list">
-                    {group.items.map((item) => (
-                      <div key={item.name}>
-                        <span>{item.name}</span>
-                        <i aria-hidden="true" />
-                        <strong>{item.price}</strong>
-                      </div>
-                    ))}
+              <article className="service-group" id={slug(group.title)} key={group.title}>
+                <header className="service-group__heading">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h2>{group.title}</h2>
+                    {group.note ? <p>{group.note}</p> : null}
                   </div>
-                </article>
-              </Reveal>
+                </header>
+                <div className="price-list">
+                  {group.items.map((item) => (
+                    <div key={item.name}>
+                      <span>{item.name}</span>
+                      <i aria-hidden="true" />
+                      <strong>{item.price}</strong>
+                    </div>
+                  ))}
+                </div>
+              </article>
             ))}
           </div>
 
@@ -78,11 +76,11 @@ export function Services() {
 
       <section className="section brazilian-section">
         <div className="container split-feature">
-          <Reveal className="split-feature__media">
+          <div className="split-feature__media">
             <ResponsiveImage baseName="salon/ourspace7" alt="Long blonde hair styled in smooth polished waves" width={900} height={1055} sizes="(max-width: 760px) 100vw, 48vw" />
             <span className="image-caption">Smoothness and movement, customized to the guest</span>
-          </Reveal>
-          <Reveal className="split-feature__copy" delay={80}>
+          </div>
+          <div className="split-feature__copy">
             <img src={assetUrl('images/brand/brazilian-blowout.webp')} alt="Brazilian Blowout" width="181" height="37" className="service-brand-logo" loading="lazy" />
             <p className="eyebrow eyebrow--dark">Smoothing specialty</p>
             <h2>Less frizz. More flexibility.</h2>
@@ -94,7 +92,7 @@ export function Services() {
               <li>No waiting period before normal daily activities</li>
             </ul>
             <a className="button button--black" href={site.bookingUrl} target="_blank" rel="noreferrer">Book a consultation <span aria-hidden="true">↗</span></a>
-          </Reveal>
+          </div>
         </div>
       </section>
     </>

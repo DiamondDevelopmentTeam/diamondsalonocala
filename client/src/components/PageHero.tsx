@@ -7,6 +7,7 @@ type PageHeroProps = {
   imageBase?: string;
   imageAlt?: string;
   imagePosition?: string;
+  className?: string;
 };
 
 export function PageHero({
@@ -16,9 +17,10 @@ export function PageHero({
   imageBase = 'salon/ourspace5',
   imageAlt = 'Interior of Diamond Salon Ocala',
   imagePosition,
+  className = '',
 }: PageHeroProps) {
   return (
-    <section className="page-hero">
+    <section className={`page-hero ${className}`.trim()}>
       <div className="page-hero__copy">
         <div className="page-hero__copy-inner">
           <p className="eyebrow">{eyebrow}</p>
