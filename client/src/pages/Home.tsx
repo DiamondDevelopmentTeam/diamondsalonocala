@@ -21,7 +21,8 @@ const amenities = [
   'Refreshment bar',
 ];
 
-const featuredTeam = [teamMembers[0], teamMembers[2], teamMembers[5], teamMembers[7]];
+const featuredTeam = ['brooke-bynum', 'careliz-torres', 'jasleen-herrera', 'samantha-deleon']
+  .map((slug) => teamMembers.find((member) => member.slug === slug));
 const featuredGallery = [galleryImages[0], galleryImages[2], galleryImages[3], galleryImages[10], galleryImages[11]];
 
 export function Home() {

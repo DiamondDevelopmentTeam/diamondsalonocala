@@ -1,16 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { PageHero } from '../components/PageHero';
 import { ResponsiveImage } from '../components/ResponsiveImage';
-import { teamCategories, teamMembers, type TeamCategory } from '../data/team';
+import { TeamBioModal } from '../components/TeamBioModal';
+import { teamCategories, teamMembers, type TeamCategory, type TeamMember } from '../data/team';
 
 type Filter = 'All' | TeamCategory;
 
 export function Team() {
   const [filter, setFilter] = useState<Filter>('All');
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const visibleMembers = useMemo(
     () => filter === 'All' ? teamMembers : teamMembers.filter((member) => member.category === filter),
     [filter],
   );
+  const closeBio = useCallback(() => setSelectedMember(null), []);
 
   return (
     <>
@@ -64,15 +67,17 @@ export function Team() {
                   sizes="(max-width: 650px) 100vw, (max-width: 1050px) 50vw, 33vw"
                 />
                 <div className="team-card__body">
-                  <p className="team-card__role">{member.role}</p>
+                  <div className="team-card__meta">
+                    {member.location ? <p className="team-card__location">{member.location}</p> : null}
+                    <p className="team-card__role">{member.role}</p>
+                  </div>
                   <h2>{member.name}</h2>
                   <ul className="specialty-list" aria-label={`${member.name}'s specialties`}>
                     {member.specialties.map((specialty) => <li key={specialty}>{specialty}</li>)}
                   </ul>
-                  <details className="profile-details">
-                    <summary>About {member.name.split(' ')[0]} <span aria-hidden="true">+</span></summary>
-                    <div>{member.bio.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
-                  </details>
+                  <button className="team-card__bio-button" type="button" onClick={() => setSelectedMember(member)}>
+                    About {member.name.split(' ')[0]} <span aria-hidden="true">↗</span>
+                  </button>
                   <div className="team-card__actions">
                     <a className="button button--black" href={member.bookingUrl} target="_blank" rel="noreferrer">Book <span aria-hidden="true">↗</span></a>
                     {member.instagramUrl ? <a className="arrow-link" href={member.instagramUrl} target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a> : null}
@@ -83,6 +88,8 @@ export function Team() {
           </div>
         </div>
       </section>
+
+      <TeamBioModal member={selectedMember} onClose={closeBio} />
     </>
   );
 }
