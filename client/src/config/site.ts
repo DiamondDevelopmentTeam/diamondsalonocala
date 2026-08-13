@@ -26,6 +26,7 @@ export const navItems = [
   { label: 'Services', to: '/services' },
   { label: 'The Salon', to: '/our-space' },
   { label: 'Giving Back', to: '/giving-back' },
+  { label: 'Join the Team', to: '/join-our-team' },
   { label: 'Contact', to: '/contact' },
 ] as const;
 
@@ -33,5 +34,4 @@ export const utilityNavItems = [
   { label: 'Specials', to: '/specials' },
   { label: 'Client Forms', to: '/forms' },
   { label: 'Salon Etiquette', to: '/salon-etiquette' },
-  { label: 'Join Our Team', to: '/join-our-team' },
 ] as const;

@@ -5,16 +5,8 @@ import { assetUrl } from '../lib/assets';
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 42);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -51,7 +43,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className={`site-header ${scrolled ? 'site-header--scrolled' : ''}`}>
+    <header className="site-header">
       <div className="header-utility" aria-label="Salon contact links">
         <div className="container header-utility__inner">
           <a href={site.mapsUrl} target="_blank" rel="noreferrer">Ocala, Florida</a>

@@ -1,46 +1,53 @@
-const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const inquiryApiUrl = import.meta.env.VITE_INQUIRY_API_URL?.trim() || '';
 
-export const hasSubmissionApi =
-  import.meta.env.DEV ||
-  Boolean(import.meta.env.VITE_API_URL) ||
-  import.meta.env.VITE_ENABLE_SAME_ORIGIN_API === 'true';
+export const hasSalonFormsApi = import.meta.env.DEV || import.meta.env.VITE_ENABLE_SAME_ORIGIN_API === 'true';
+export const hasInquiryApi = Boolean(inquiryApiUrl);
 
 type ApiErrorPayload = {
-  error?: string;
+  error?: string | { message?: string };
+  message?: string;
 };
 
-export async function postJson<TPayload extends Record<string, unknown>>(
-  path: string,
+async function requestJson<TPayload extends Record<string, unknown>>(
+  url: string,
   payload: TPayload,
 ): Promise<void> {
-  const response = await fetch(`${apiBase}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
 
-  if (!response.ok) {
-    let message = 'We could not send your request. Please try again.';
-    try {
-      const data = (await response.json()) as ApiErrorPayload;
-      if (data.error) message = data.error;
-    } catch {
-      // Keep the friendly fallback message.
-    }
-    throw new Error(message);
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch {
+    throw new Error('We could not connect to the secure form service. Please check your connection and try again.');
   }
+
+  if (response.ok) return;
+
+  let data: ApiErrorPayload | null = null;
+  try {
+    data = (await response.json()) as ApiErrorPayload;
+  } catch {
+    // Keep the provider-neutral fallback below.
+  }
+
+  const serviceMessage = typeof data?.error === 'object' ? data.error.message : data?.error;
+  if (response.status === 429) {
+    throw new Error('Too many requests were sent. Please wait a few minutes and try again.');
+  }
+  throw new Error(serviceMessage || data?.message || 'We could not send your request. Please try again later.');
 }
 
-export function openEmailDraft(
-  to: string,
-  subject: string,
-  fields: Array<[string, string]>,
-): void {
-  const body = fields
-    .filter(([, value]) => value.trim())
-    .map(([label, value]) => `${label}: ${value.trim()}`)
-    .join('\n\n');
-  window.location.assign(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+export async function postInquiry<TPayload extends Record<string, unknown>>(payload: TPayload): Promise<void> {
+  if (!inquiryApiUrl) {
+    throw new Error('Online form delivery is temporarily unavailable. Please contact the salon by phone or email.');
+  }
+  await requestJson(inquiryApiUrl, payload);
+}
+
+export async function postSalonForm<TPayload extends Record<string, unknown>>(payload: TPayload): Promise<void> {
+  await requestJson('/api/forms', payload);
 }

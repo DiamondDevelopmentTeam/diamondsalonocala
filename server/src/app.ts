@@ -21,11 +21,11 @@ export function createApp() {
       ? {
           directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],
+            scriptSrc: ["'self'", 'https://www.google.com', 'https://www.gstatic.com'],
             styleSrc: ["'self'", "'unsafe-inline'"],
-            imgSrc: ["'self'", 'data:', 'blob:'],
-            connectSrc: ["'self'"],
-            frameSrc: ["'self'", 'https://www.google.com'],
+            imgSrc: ["'self'", 'data:', 'blob:', 'https://www.google.com', 'https://www.gstatic.com'],
+            connectSrc: ["'self'", 'https://www.google.com'],
+            frameSrc: ["'self'", 'https://www.google.com', 'https://recaptcha.google.com'],
             objectSrc: ["'none'"],
           },
         }

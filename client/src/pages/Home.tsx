@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveImage } from '../components/ResponsiveImage';
 import { Reveal } from '../components/Reveal';
+import { TransformationComparison } from '../components/TransformationComparison';
 import { site } from '../config/site';
 import { galleryImages } from '../data/gallery';
 import { teamMembers } from '../data/team';
 
 const serviceHighlights = [
-  { number: '01', title: 'Cut & color', copy: 'Precision cuts, dimensional color, blonding, lived-in tones, vivid work, and polished finishing.' },
-  { number: '02', title: 'Texture & length', copy: 'Smoothing treatments, Dominican blowouts, extensions, braiding, wigs, and texture-aware care.' },
-  { number: '03', title: 'Skin & lashes', copy: 'Customized facials, corrective skincare, expert waxing, spray tanning, and lash services.' },
-  { number: '04', title: 'Nails & details', copy: 'Thoughtful enhancements, detailed artistry, and beauty services tailored by independent professionals.' },
+  { number: '01', title: 'Cut & Color', copy: 'Precision cuts, dimensional color, blonding, lived-in tones, vivid work, and polished finishing.' },
+  { number: '02', title: 'Texture & Length', copy: 'Smoothing treatments, texture services, extensions, styling, and transformations designed around your hair.' },
+  { number: '03', title: 'Skin & Lashes', copy: 'Customized facials, corrective skincare, expert waxing, spray tanning, lash services, and more.' },
+  { number: '04', title: 'Nails & Details', copy: 'Thoughtful manicures, pedicures, nail artistry, and beauty services tailored by independent professionals.' },
 ];
 
 const amenities = [
@@ -27,22 +28,6 @@ const featuredGallery = [galleryImages[0], galleryImages[2], galleryImages[3], g
 
 export function Home() {
   const heroMediaRef = useRef<HTMLDivElement>(null);
-  const serviceTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const [activeService, setActiveService] = useState(0);
-
-  const selectServiceFromKeyboard = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
-    let nextIndex = index;
-
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (index + 1) % serviceHighlights.length;
-    else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (index - 1 + serviceHighlights.length) % serviceHighlights.length;
-    else if (event.key === 'Home') nextIndex = 0;
-    else if (event.key === 'End') nextIndex = serviceHighlights.length - 1;
-    else return;
-
-    event.preventDefault();
-    setActiveService(nextIndex);
-    serviceTabRefs.current[nextIndex]?.focus();
-  };
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -75,9 +60,9 @@ export function Home() {
             height={1200}
             loading="eager"
             fetchPriority="high"
-            sizes="(max-width: 760px) 100vw, 60vw"
+            sizes="100vw"
           />
-          <span className="home-hero__image-caption">Inside Diamond Salon · Ocala, Florida</span>
+          <span className="home-hero__image-caption">A modern beauty collective · Ocala, Florida</span>
         </div>
 
         <div className="home-hero__copy">
@@ -87,7 +72,7 @@ export function Home() {
             <p className="home-hero__lede">A modern salon collective for considered color, confident cuts, skin, nails, and finishing services—delivered by professionals who make the experience their own.</p>
             <div className="button-row">
               <a className="button button--gold" href={site.bookingUrl} target="_blank" rel="noreferrer">Reserve your visit <span aria-hidden="true">↗</span></a>
-              <Link className="button button--line-light" to="/team">Find your professional</Link>
+              <Link className="button button--line-light" to="/services">Explore services</Link>
             </div>
           </div>
         </div>
@@ -98,6 +83,8 @@ export function Home() {
           <div><span>Reception hours</span><p>Mon–Fri 8:30–5 · Sat 9–12</p></div>
         </div>
       </section>
+
+      <TransformationComparison />
 
       <section className="section intro-section">
         <div className="container editorial-intro">
@@ -115,57 +102,41 @@ export function Home() {
 
       <section id="services-preview" className="section service-index">
         <div className="container">
-          <Reveal className="section-heading section-heading--spread">
+          <Reveal className="service-index__intro">
             <div>
-              <p className="eyebrow">What we do</p>
-              <h2>Expertise, without the one-size-fits-all.</h2>
+              <p className="eyebrow">Our services</p>
+              <h2>Everything you need,<br />under one roof.</h2>
             </div>
-            <p>Services are provided by independent professionals, so exact offerings, prices, and booking details may vary by specialist.</p>
+            <p>From dimensional color and extensions to nails, lashes, skin, and finishing details, Diamond Salon brings independent beauty professionals together in one polished destination.</p>
           </Reveal>
 
-          <div className="service-tabs">
-            <div className="service-tabs__list" role="tablist" aria-label="Service categories">
-              {serviceHighlights.map((service, index) => (
-                <button
-                  key={service.title}
-                  ref={(element) => { serviceTabRefs.current[index] = element; }}
-                  id={`home-service-tab-${index}`}
-                  className="service-tabs__tab"
-                  type="button"
-                  role="tab"
-                  aria-selected={activeService === index}
-                  aria-controls={`home-service-panel-${index}`}
-                  tabIndex={activeService === index ? 0 : -1}
-                  onClick={() => setActiveService(index)}
-                  onKeyDown={(event) => selectServiceFromKeyboard(event, index)}
-                >
-                  <span>{service.number}</span>
-                  <h3>{service.title}</h3>
-                </button>
-              ))}
-            </div>
-
-            {serviceHighlights.map((service, index) => (
-              <div
-                id={`home-service-panel-${index}`}
-                className="service-tabs__panel"
-                role="tabpanel"
-                aria-labelledby={`home-service-tab-${index}`}
-                tabIndex={0}
-                hidden={activeService !== index}
-                key={service.title}
-              >
-                <div className="service-tabs__panel-inner">
-                  <span aria-hidden="true">{service.number}</span>
-                  <div>
-                    <h3>{service.title}</h3>
-                    <p>{service.copy}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="service-preview-list" aria-label="Service categories">
+            {serviceHighlights.map((service, index) => {
+              return (
+                <Reveal key={service.title} className="service-preview__reveal" delay={index * 60}>
+                  <Link className="service-preview__row" to="/services">
+                    <span className="service-preview__number">{service.number}</span>
+                    <div className="service-preview__copy">
+                      <h3>{service.title}</h3>
+                      <p>{service.copy}</p>
+                    </div>
+                    <span className="service-preview__arrow" aria-hidden="true">→</span>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
-          <Reveal className="centered-action"><Link className="button button--line-light" to="/services">View services &amp; pricing</Link></Reveal>
+
+          <Reveal className="service-preview-cta">
+            <div>
+              <h3>Not sure where to start?</h3>
+              <p>Explore our complete service menu, discover our professionals, and find the right service for you.</p>
+            </div>
+            <div className="button-row">
+              <Link className="button button--black" to="/services">Explore all services <span aria-hidden="true">→</span></Link>
+              <a className="button button--line-dark" href={site.bookingUrl} target="_blank" rel="noreferrer">Book an appointment <span aria-hidden="true">↗</span></a>
+            </div>
+          </Reveal>
         </div>
       </section>
 

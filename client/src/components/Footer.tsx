@@ -6,9 +6,9 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="container footer-intro">
-        <p>Ready when you are.</p>
-        <h2>Make space for a little more confidence.</h2>
-        <a className="button button--gold" href={site.bookingUrl} target="_blank" rel="noreferrer">Book your visit <span aria-hidden="true">↗</span></a>
+        <p>Your next look</p>
+        <h2>Ready for what comes next?</h2>
+        <a className="button button--gold" href={site.bookingUrl} target="_blank" rel="noreferrer">Book an appointment <span aria-hidden="true">↗</span></a>
       </div>
 
       <div className="container footer-grid">

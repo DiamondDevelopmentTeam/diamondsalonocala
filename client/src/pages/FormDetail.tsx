@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PageHero } from '../components/PageHero';
 import { SubmitButton } from '../components/SubmitButton';
 import { getSalonForm } from '../data/forms';
-import { hasSubmissionApi, postJson } from '../lib/api';
+import { hasSalonFormsApi, postSalonForm } from '../lib/api';
 
 export function FormDetail() {
   const { slug = '' } = useParams();
@@ -27,14 +27,14 @@ export function FormDetail() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!hasSubmissionApi) return;
+    if (!hasSalonFormsApi) return;
     setStatus('pending');
     setMessage('');
 
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     try {
-      await postJson('/api/forms', {
+      await postSalonForm({
         formSlug: activeForm.slug,
         formTitle: activeForm.title,
         name: String(form.get('name') || ''),
@@ -67,7 +67,7 @@ export function FormDetail() {
       <section className="section section--cream">
         <div className="container narrow-container">
           <form className="salon-form" onSubmit={handleSubmit}>
-            {!hasSubmissionApi ? (
+            {!hasSalonFormsApi ? (
               <div className="form-availability" role="note">
                 <strong>Online submission is not connected on this static preview.</strong>
                 <p>Please contact the salon to complete this form securely. Do not send sensitive health details by ordinary email.</p>
@@ -108,7 +108,7 @@ export function FormDetail() {
               <span>{activeForm.consentText}</span>
             </label>
             <p className="form-disclaimer">Submitting this form sends the information to the salon. Do not include highly sensitive medical or financial information.</p>
-            <SubmitButton pending={status === 'pending'} disabled={!hasSubmissionApi} label="Submit form" />
+            <SubmitButton pending={status === 'pending'} disabled={!hasSalonFormsApi} label="Submit form" />
             {message ? <p className={`form-status form-status--${status}`} role="status">{message}</p> : null}
           </form>
         </div>

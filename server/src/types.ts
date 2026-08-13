@@ -1,4 +1,4 @@
-export type SubmissionType = 'contact' | 'join-team' | 'salon-form';
+export type SubmissionType = 'salon-form';
 
 export type StoredSubmission = {
   id: string;

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { PageHero } from '../components/PageHero';
 import { ResponsiveImage } from '../components/ResponsiveImage';
+import { Reveal } from '../components/Reveal';
 import { TeamBioModal } from '../components/TeamBioModal';
 import { teamCategories, teamMembers, type TeamCategory, type TeamMember } from '../data/team';
 
@@ -55,35 +56,40 @@ export function Team() {
           <p className="team-results" aria-live="polite">Showing {visibleMembers.length} {visibleMembers.length === 1 ? 'professional' : 'professionals'}</p>
 
           <div className="team-grid">
-            {visibleMembers.map((member) => (
-              <article className="team-card" key={member.slug}>
-                <ResponsiveImage
-                  baseName={`team/${member.slug}`}
-                  alt={`Portrait of ${member.name}, ${member.role}`}
-                  width={1000}
-                  height={1400}
-                  className="team-card__media"
-                  position={member.imagePosition}
-                  sizes="(max-width: 650px) 100vw, (max-width: 1050px) 50vw, 33vw"
-                />
-                <div className="team-card__body">
-                  <div className="team-card__meta">
-                    {member.location ? <p className="team-card__location">{member.location}</p> : null}
-                    <p className="team-card__role">{member.role}</p>
+            {visibleMembers.map((member, index) => (
+              <Reveal className="team-card__reveal" delay={(index % 3) * 55} key={member.slug}>
+                <article className="team-card">
+                  <div className="team-card__portrait">
+                    <span className="team-card__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                    <ResponsiveImage
+                      baseName={`team/${member.slug}`}
+                      alt={`Portrait of ${member.name}, ${member.role}`}
+                      width={1000}
+                      height={1400}
+                      className="team-card__media"
+                      position={member.imagePosition}
+                      sizes="(max-width: 650px) 100vw, (max-width: 1050px) 50vw, 32vw"
+                    />
                   </div>
-                  <h2>{member.name}</h2>
-                  <ul className="specialty-list" aria-label={`${member.name}'s specialties`}>
-                    {member.specialties.map((specialty) => <li key={specialty}>{specialty}</li>)}
-                  </ul>
-                  <button className="team-card__bio-button" type="button" onClick={() => setSelectedMember(member)}>
-                    About {member.name.split(' ')[0]} <span aria-hidden="true">↗</span>
-                  </button>
-                  <div className="team-card__actions">
-                    <a className="button button--black" href={member.bookingUrl} target="_blank" rel="noreferrer">Book <span aria-hidden="true">↗</span></a>
-                    {member.instagramUrl ? <a className="arrow-link" href={member.instagramUrl} target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a> : null}
+                  <div className="team-card__body">
+                    <div className="team-card__meta">
+                      {member.location ? <p className="team-card__location">{member.location}</p> : null}
+                      <p className="team-card__role">{member.role}</p>
+                    </div>
+                    <h2>{member.name}</h2>
+                    <ul className="specialty-list" aria-label={`${member.name}'s specialties`}>
+                      {member.specialties.map((specialty) => <li key={specialty}>{specialty}</li>)}
+                    </ul>
+                    <button className="team-card__bio-button" type="button" onClick={() => setSelectedMember(member)}>
+                      Read {member.name.split(' ')[0]}'s story <span aria-hidden="true">↗</span>
+                    </button>
+                    <div className="team-card__actions">
+                      <a className="button button--black" href={member.bookingUrl} target="_blank" rel="noreferrer">Book <span aria-hidden="true">↗</span></a>
+                      {member.instagramUrl ? <a className="arrow-link" href={member.instagramUrl} target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a> : null}
+                    </div>
                   </div>
-                </div>
-              </article>
+                </article>
+              </Reveal>
             ))}
           </div>
         </div>

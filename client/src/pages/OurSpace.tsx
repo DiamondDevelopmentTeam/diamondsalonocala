@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHero } from '../components/PageHero';
 import { ResponsiveImage } from '../components/ResponsiveImage';
@@ -14,7 +14,13 @@ const spaceDetails = [
 export function OurSpace() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLButtonElement | null>(null);
   const selectedImage = selectedIndex === null ? null : galleryImages[selectedIndex];
+  const closeLightbox = useCallback(() => {
+    setSelectedIndex(null);
+    window.requestAnimationFrame(() => returnFocusRef.current?.focus());
+  }, []);
 
   useEffect(() => {
     if (selectedIndex === null) return;
@@ -22,9 +28,24 @@ export function OurSpace() {
     closeButtonRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSelectedIndex(null);
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeLightbox();
+      }
       if (event.key === 'ArrowRight') setSelectedIndex((current) => current === null ? 0 : (current + 1) % galleryImages.length);
       if (event.key === 'ArrowLeft') setSelectedIndex((current) => current === null ? 0 : (current - 1 + galleryImages.length) % galleryImages.length);
+      if (event.key === 'Tab' && lightboxRef.current) {
+        const focusable = Array.from(lightboxRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]'));
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -32,7 +53,7 @@ export function OurSpace() {
       document.body.classList.remove('lightbox-open');
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [selectedIndex]);
+  }, [closeLightbox, selectedIndex]);
 
   return (
     <>
@@ -80,7 +101,15 @@ export function OurSpace() {
         <div className="container salon-gallery">
           {galleryImages.map((image, index) => (
             <Reveal key={image.baseName} className={`salon-gallery__reveal salon-gallery__reveal--${image.orientation}`} delay={(index % 4) * 45}>
-              <button type="button" className="gallery-tile" onClick={() => setSelectedIndex(index)} aria-label={`Open image: ${image.label}`}>
+              <button
+                type="button"
+                className="gallery-tile"
+                onClick={(event) => {
+                  returnFocusRef.current = event.currentTarget;
+                  setSelectedIndex(index);
+                }}
+                aria-label={`Open image: ${image.label}`}
+              >
                 <ResponsiveImage baseName={image.baseName} alt={image.alt} width={image.width} height={image.height} position={image.position} sizes="(max-width: 680px) 100vw, (max-width: 1000px) 50vw, 33vw" />
                 <span><i>{String(index + 1).padStart(2, '0')}</i>{image.label}<b aria-hidden="true">↗</b></span>
               </button>
@@ -104,11 +133,11 @@ export function OurSpace() {
 
       {selectedImage ? (
         <div className="lightbox" role="dialog" aria-modal="true" aria-label={`${selectedImage.label}, image ${selectedIndex! + 1} of ${galleryImages.length}`}>
-          <button type="button" className="lightbox__backdrop" aria-label="Close gallery" onClick={() => setSelectedIndex(null)} />
-          <div className="lightbox__content">
+          <button type="button" className="lightbox__backdrop" aria-label="Close gallery" onClick={closeLightbox} />
+          <div className="lightbox__content" ref={lightboxRef}>
             <div className="lightbox__topbar">
               <p><span>{String(selectedIndex! + 1).padStart(2, '0')} / {galleryImages.length}</span>{selectedImage.label}</p>
-              <button ref={closeButtonRef} type="button" className="lightbox__close" aria-label="Close gallery" onClick={() => setSelectedIndex(null)}>Close <span aria-hidden="true">×</span></button>
+              <button ref={closeButtonRef} type="button" className="lightbox__close" aria-label="Close gallery" onClick={closeLightbox}>Close <span aria-hidden="true">×</span></button>
             </div>
             <ResponsiveImage baseName={selectedImage.baseName} alt={selectedImage.alt} width={selectedImage.width} height={selectedImage.height} loading="eager" position={selectedImage.position} sizes="95vw" />
             <div className="lightbox__controls">

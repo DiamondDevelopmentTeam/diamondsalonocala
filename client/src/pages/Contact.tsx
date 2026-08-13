@@ -1,46 +1,62 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { PageHero } from '../components/PageHero';
+import { RecaptchaCheckbox } from '../components/RecaptchaCheckbox';
 import { SubmitButton } from '../components/SubmitButton';
 import { site } from '../config/site';
-import { hasSubmissionApi, openEmailDraft, postJson } from '../lib/api';
+import { hasInquiryApi, postInquiry } from '../lib/api';
 
 export function Contact() {
   const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim() || '';
+  const handleCaptchaChange = useCallback((token: string) => setCaptchaToken(token), []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (status === 'pending') return;
+    if (!hasInquiryApi) {
+      setStatus('error');
+      setMessage('Online message delivery is unavailable. Please call or email the salon.');
+      return;
+    }
+    if (!captchaToken) {
+      setStatus('error');
+      setMessage('Please complete the “I’m not a robot” verification before sending.');
+      return;
+    }
+
     setStatus('pending');
     setMessage('');
 
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     const payload = {
+      site: 'diamond-salon-ocala',
+      websiteName: 'Diamond Salon',
+      formType: 'contact',
       name: String(form.get('name') || ''),
       email: String(form.get('email') || ''),
       phone: String(form.get('phone') || ''),
       subject: String(form.get('subject') || ''),
       message: String(form.get('message') || ''),
+      pageUrl: window.location.href,
+      submittedAt: new Date().toISOString(),
+      recaptchaToken: captchaToken,
+      website: String(form.get('website') || ''),
     };
 
-    if (!hasSubmissionApi) {
-      openEmailDraft(site.primaryEmail, `Diamond Salon website: ${payload.subject}`, [
-        ['Name', payload.name],
-        ['Email', payload.email],
-        ['Phone', payload.phone],
-        ['Message', payload.message],
-      ]);
-      setStatus('success');
-      setMessage('Your email app has been opened with this message ready to review and send.');
-      return;
-    }
-
     try {
-      await postJson('/api/contact', payload);
+      await postInquiry(payload);
       formElement.reset();
+      setCaptchaToken('');
+      setCaptchaResetKey((value) => value + 1);
       setStatus('success');
       setMessage('Thank you. Your message has been sent to the salon.');
     } catch (error) {
+      setCaptchaToken('');
+      setCaptchaResetKey((value) => value + 1);
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Unable to send your message.');
     }
@@ -75,11 +91,11 @@ export function Contact() {
             </div>
           </div>
 
-          <form className="salon-form contact-form" onSubmit={handleSubmit}>
+          <form className="salon-form contact-form" onSubmit={handleSubmit} aria-busy={status === 'pending'}>
             <div className="form-heading">
               <span>Send a note</span>
               <h2>How can we help?</h2>
-              {!hasSubmissionApi ? <p>This static site will prepare your message in your email app so you can review it before sending.</p> : null}
+              {!hasInquiryApi ? <p>Online message delivery is unavailable. Please call or email the salon.</p> : null}
             </div>
             <div className="form-grid-two">
               <label>
@@ -110,8 +126,20 @@ export function Contact() {
               Message
               <textarea name="message" rows={7} required minLength={10} maxLength={4000} />
             </label>
-            <SubmitButton pending={status === 'pending'} label={hasSubmissionApi ? 'Send message' : 'Continue in email'} />
-            {message ? <p className={`form-status form-status--${status}`} role="status">{message}</p> : null}
+            <label className="honeypot" aria-hidden="true">
+              Website<input name="website" tabIndex={-1} autoComplete="off" />
+            </label>
+            <RecaptchaCheckbox
+              siteKey={recaptchaSiteKey}
+              resetKey={captchaResetKey}
+              onTokenChange={handleCaptchaChange}
+            />
+            <SubmitButton
+              pending={status === 'pending'}
+              label="Send message"
+              disabled={!hasInquiryApi || !captchaToken}
+            />
+            {message ? <p className={`form-status form-status--${status}`} role={status === 'error' ? 'alert' : 'status'}>{message}</p> : null}
           </form>
         </div>
       </section>

@@ -12,6 +12,7 @@
     "build": "npm run build --workspace client && npm run build --workspace server",
     "build:pages": "npm run build --workspace client",
     "lint": "eslint client/src client/vite.config.ts server/src",
+    "test": "npm run test --workspace server",
     "start": "npm run start --workspace server",
     "typecheck": "npm run typecheck --workspace client && npm run typecheck --workspace server",
     "clean": "node scripts/clean.mjs"

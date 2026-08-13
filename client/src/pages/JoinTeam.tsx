@@ -1,22 +1,41 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { PageHero } from '../components/PageHero';
+import { RecaptchaCheckbox } from '../components/RecaptchaCheckbox';
 import { ResponsiveImage } from '../components/ResponsiveImage';
 import { SubmitButton } from '../components/SubmitButton';
 import { site } from '../config/site';
-import { hasSubmissionApi, openEmailDraft, postJson } from '../lib/api';
+import { hasInquiryApi, postInquiry } from '../lib/api';
 
 export function JoinTeam() {
   const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim() || '';
+  const handleCaptchaChange = useCallback((token: string) => setCaptchaToken(token), []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (status === 'pending') return;
+    if (!hasInquiryApi) {
+      setStatus('error');
+      setMessage('Online inquiry delivery is unavailable. Please call or email the salon.');
+      return;
+    }
+    if (!captchaToken) {
+      setStatus('error');
+      setMessage('Please complete the “I’m not a robot” verification before sending.');
+      return;
+    }
     setStatus('pending');
     setMessage('');
 
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     const payload = {
+      site: 'diamond-salon-ocala',
+      websiteName: 'Diamond Salon',
+      formType: 'inquiry',
       name: String(form.get('name') || ''),
       email: String(form.get('email') || ''),
       phone: String(form.get('phone') || ''),
@@ -25,30 +44,22 @@ export function JoinTeam() {
       yearsExperience: String(form.get('yearsExperience') || ''),
       instagramOrPortfolio: String(form.get('instagramOrPortfolio') || ''),
       message: String(form.get('message') || ''),
+      pageUrl: window.location.href,
+      submittedAt: new Date().toISOString(),
+      recaptchaToken: captchaToken,
+      website: String(form.get('website') || ''),
     };
 
-    if (!hasSubmissionApi) {
-      openEmailDraft(site.primaryEmail, 'Booth rental opportunity at Diamond Salon', [
-        ['Name', payload.name],
-        ['Email', payload.email],
-        ['Phone', payload.phone],
-        ['Specialty', payload.specialty],
-        ['Florida license number', payload.licenseNumber],
-        ['Years of experience', payload.yearsExperience],
-        ['Portfolio or Instagram', payload.instagramOrPortfolio],
-        ['Message', payload.message],
-      ]);
-      setStatus('success');
-      setMessage('Your email app has been opened with this inquiry ready to review and send to Brooke.');
-      return;
-    }
-
     try {
-      await postJson('/api/join-team', payload);
+      await postInquiry(payload);
       formElement.reset();
+      setCaptchaToken('');
+      setCaptchaResetKey((value) => value + 1);
       setStatus('success');
       setMessage('Your inquiry has been sent. The salon manager will review it and follow up.');
     } catch (error) {
+      setCaptchaToken('');
+      setCaptchaResetKey((value) => value + 1);
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Unable to send your inquiry.');
     }
@@ -87,7 +98,7 @@ export function JoinTeam() {
             <div className="form-heading">
               <span>Start the conversation</span>
               <h2>Tell us about your work.</h2>
-              {!hasSubmissionApi ? <p>This static site will prepare the inquiry in your email app for you to review and send.</p> : null}
+              {!hasInquiryApi ? <p>Online inquiry delivery is unavailable. Please call or email the salon.</p> : null}
             </div>
             <div className="form-grid-two">
               <label>Full name<input name="name" required minLength={2} autoComplete="name" /></label>
@@ -112,7 +123,9 @@ export function JoinTeam() {
             </div>
             <label>Instagram or portfolio URL<input name="instagramOrPortfolio" type="url" placeholder="https://" /></label>
             <label>What are you looking for in your next salon?<textarea name="message" rows={6} required minLength={20} maxLength={4000} /></label>
-            <SubmitButton pending={status === 'pending'} label={hasSubmissionApi ? 'Send inquiry' : 'Continue in email'} />
+            <label className="honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+            <RecaptchaCheckbox siteKey={recaptchaSiteKey} resetKey={captchaResetKey} onTokenChange={handleCaptchaChange} />
+            <SubmitButton pending={status === 'pending'} disabled={!hasInquiryApi || !captchaToken} label="Send inquiry" />
             {message ? <p className={`form-status form-status--${status}`} role="status">{message}</p> : null}
           </form>
         </div>

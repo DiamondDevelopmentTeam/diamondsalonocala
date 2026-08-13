@@ -40,10 +40,24 @@ jobs:
           npm run lint
           npm run typecheck
 
+      - name: Validate public form configuration
+        env:
+          VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
+        shell: bash
+        run: |
+          test -n "$VITE_INQUIRY_API_URL"
+          test -n "$VITE_RECAPTCHA_SITE_KEY"
+          case "$VITE_INQUIRY_API_URL" in
+            https://*/api/send-inquiry) ;;
+            *) echo "VITE_INQUIRY_API_URL must be the HTTPS shared Function send-inquiry route." >&2; exit 1 ;;
+          esac
+
       - name: Build GitHub Pages site
         env:
           VITE_BASE_PATH: /diamondsalonocala/
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
         run: npm run build:pages
 
       - name: Verify Pages artifact
