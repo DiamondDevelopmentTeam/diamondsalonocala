@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { PageHero } from '../components/PageHero';
-import { ResponsiveImage } from '../components/ResponsiveImage';
 import { Reveal } from '../components/Reveal';
 import { TeamBioModal } from '../components/TeamBioModal';
+import { TeamPortrait } from '../components/TeamPortrait';
 import { teamCategories, teamMembers, type TeamCategory, type TeamMember } from '../data/team';
 
 type Filter = 'All' | TeamCategory;
@@ -61,13 +61,9 @@ export function Team() {
                 <article className="team-card">
                   <div className="team-card__portrait">
                     <span className="team-card__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                    <ResponsiveImage
-                      baseName={`team/${member.slug}`}
-                      alt={`Portrait of ${member.name}, ${member.role}`}
-                      width={1000}
-                      height={1400}
+                    <TeamPortrait
+                      member={member}
                       className="team-card__media"
-                      position={member.imagePosition}
                       sizes="(max-width: 650px) 100vw, (max-width: 1050px) 50vw, 32vw"
                     />
                   </div>
@@ -75,6 +71,9 @@ export function Team() {
                     <div className="team-card__meta">
                       {member.location ? <p className="team-card__location">{member.location}</p> : null}
                       <p className="team-card__role">{member.role}</p>
+                      {member.phoneDisplay && member.phoneHref ? (
+                        <a className="team-card__phone" href={member.phoneHref} aria-label={`Call ${member.name} at ${member.phoneDisplay}`}>{member.phoneDisplay}</a>
+                      ) : null}
                     </div>
                     <h2>{member.name}</h2>
                     <ul className="specialty-list" aria-label={`${member.name}'s specialties`}>
@@ -84,7 +83,15 @@ export function Team() {
                       Read {member.name.split(' ')[0]}'s story <span aria-hidden="true">↗</span>
                     </button>
                     <div className="team-card__actions">
-                      <a className="button button--black" href={member.bookingUrl} target="_blank" rel="noreferrer">Book <span aria-hidden="true">↗</span></a>
+                      <a
+                        className="button button--black"
+                        href={member.bookingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Book with ${member.name} (opens in a new tab)`}
+                      >
+                        Book <span aria-hidden="true">↗</span>
+                      </a>
                       {member.instagramUrl ? <a className="arrow-link" href={member.instagramUrl} target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a> : null}
                     </div>
                   </div>

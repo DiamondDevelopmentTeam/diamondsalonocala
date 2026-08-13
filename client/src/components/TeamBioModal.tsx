@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { TeamMember } from '../data/team';
-import { ResponsiveImage } from './ResponsiveImage';
+import { TeamPortrait } from './TeamPortrait';
 
 type TeamBioModalProps = {
   member: TeamMember | null;
@@ -133,14 +133,10 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
         aria-describedby={bioId}
         tabIndex={-1}
       >
-        <ResponsiveImage
-          baseName={`team/${renderedMember.slug}`}
-          alt={`Portrait of ${renderedMember.name}, ${renderedMember.role}`}
-          width={1000}
-          height={1400}
+        <TeamPortrait
+          member={renderedMember}
           className="team-bio-modal__media"
           loading="eager"
-          position={renderedMember.imagePosition}
           sizes="(max-width: 720px) calc(100vw - 24px), 42vw"
         />
 
@@ -159,6 +155,9 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
             {renderedMember.location ? <p className="team-bio-modal__location">{renderedMember.location}</p> : null}
             <p className="team-bio-modal__role">{renderedMember.role}</p>
             <h2 id={titleId}>{renderedMember.name}</h2>
+            {renderedMember.phoneDisplay && renderedMember.phoneHref ? (
+              <a className="team-bio-modal__phone" href={renderedMember.phoneHref} aria-label={`Call ${renderedMember.name} at ${renderedMember.phoneDisplay}`}>{renderedMember.phoneDisplay}</a>
+            ) : null}
             <ul className="specialty-list" aria-label={`${renderedMember.name}'s specialties`}>
               {renderedMember.specialties.map((specialty) => <li key={specialty}>{specialty}</li>)}
             </ul>
@@ -172,6 +171,15 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
           >
             {renderedMember.bioHeading ? <h3>{renderedMember.bioHeading}</h3> : null}
             {renderedMember.bio.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            <a
+              className="button button--black team-bio-modal__booking"
+              href={renderedMember.bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Book with ${renderedMember.name} (opens in a new tab)`}
+            >
+              Book <span aria-hidden="true">↗</span>
+            </a>
             {renderedMember.localizedBio?.map((section) => (
               <section className="team-bio-modal__localized" lang="es" key={section.heading}>
                 <h3>{section.heading}</h3>

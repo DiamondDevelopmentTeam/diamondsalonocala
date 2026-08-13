@@ -3,6 +3,7 @@ import { HomeHeroCarousel } from '../components/HomeHeroCarousel';
 import { ResponsiveImage } from '../components/ResponsiveImage';
 import { Reveal } from '../components/Reveal';
 import { TransformationComparison } from '../components/TransformationComparison';
+import { TeamPortrait } from '../components/TeamPortrait';
 import { site } from '../config/site';
 import { galleryImages } from '../data/gallery';
 import { teamMembers } from '../data/team';
@@ -22,7 +23,7 @@ const amenities = [
   'Refreshment bar',
 ];
 
-const featuredTeam = ['brooke-bynum', 'careliz-torres', 'jasleen-herrera', 'samantha-deleon']
+const featuredTeam = ['brooke-bynum', 'chloe-geatches', 'careliz-torres', 'jasleen-herrera']
   .map((slug) => teamMembers.find((member) => member.slug === slug));
 const featuredGallery = [galleryImages[0], galleryImages[2], galleryImages[3], galleryImages[10], galleryImages[11]];
 
@@ -146,12 +147,8 @@ export function Home() {
               <Reveal key={member.slug} className="team-preview__reveal" delay={index * 70}>
                 <article className="profile-tile">
                   <Link to="/team" aria-label={`View ${member.name}'s profile`}>
-                    <ResponsiveImage
-                      baseName={`team/${member.slug}`}
-                      alt={`Portrait of ${member.name}, ${member.role}`}
-                      width={1000}
-                      height={1400}
-                      position={member.imagePosition}
+                    <TeamPortrait
+                      member={member}
                       sizes="(max-width: 620px) 100vw, (max-width: 980px) 50vw, 25vw"
                     />
                     <div className="profile-tile__body">

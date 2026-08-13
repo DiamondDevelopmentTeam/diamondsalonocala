@@ -16,7 +16,14 @@ export type TeamMember = {
   bioHeading?: string;
   localizedBio?: LocalizedBio[];
   bookingUrl: string;
+  bookingProvider?: 'phorest' | 'square' | 'external';
+  phoneDisplay?: string;
+  phoneHref?: string;
   instagramUrl?: string;
+  imageBaseName?: string | null;
+  imageSrc?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   imagePosition?: string;
 };
 
@@ -34,6 +41,22 @@ export const teamMembers: TeamMember[] = [
     bookingUrl: salonBooking,
     instagramUrl: 'https://www.instagram.com/glow_bybrooke/',
     bio: ['A Florida native and mother of two, Brooke leads the salon while offering tailored facial and spray-tan services. Her approach is personal, welcoming, and focused on helping every guest leave refreshed and confident.'],
+  },
+  {
+    slug: 'chloe-geatches',
+    name: 'Chloe Geatches',
+    role: 'Hairstylist',
+    category: 'Hair',
+    specialties: ['Lived-in color', 'Blonding', 'Extensions'],
+    bookingUrl: 'https://chloes-beautique.square.site/',
+    bookingProvider: 'square',
+    phoneDisplay: '352-812-1808',
+    phoneHref: 'tel:+13528121808',
+    imageSrc: 'images/team/ChloeGeatches.jpg',
+    imageWidth: 1179,
+    imageHeight: 768,
+    imagePosition: '58% 50%',
+    bio: ['Hi, I’m Chloe! I specialize in lived-in color, blonding, and extensions. My passion is helping you look and feel your absolute best with customized, beautiful hair you’ll love. I can’t wait to be a part of the team at Diamond Salon and welcome you to my chair!'],
   },
   {
     slug: 'walkiria-sosa',
