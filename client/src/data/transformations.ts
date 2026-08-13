@@ -18,7 +18,8 @@ export type Transformation = {
 };
 
 // Add a `before` and `after` image object to any entry when client photos arrive.
-// Images use the same `public/images/...` responsive format as the rest of the site.
+// Place responsive image pairs in public/images/transformations (see its README),
+// then reference them here as `transformations/image-name`.
 export const transformations: Transformation[] = [
   {
     id: 'dimensional-color',

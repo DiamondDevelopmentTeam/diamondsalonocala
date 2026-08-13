@@ -22,6 +22,8 @@ export type TeamMember = {
 
 const salonBooking = 'https://phorest.com/book/salons/diamondsalonocala';
 
+// Add each approved professional here. The Team directory and Home count are
+// generated from this array, so new profiles reflow without layout changes.
 export const teamMembers: TeamMember[] = [
   {
     slug: 'brooke-bynum',
@@ -192,16 +194,6 @@ export const teamMembers: TeamMember[] = [
     instagramUrl: 'https://www.instagram.com/ocala.hair.oscar_/',
     imagePosition: '50% 40%',
     bio: ['Hi, I’m Oscar! I specialize in lived-in, low-maintenance hair color, seamless hair extensions, and layered haircuts designed to fit your lifestyle. My goal is to create hair that’s effortless, modern, and easy to maintain while helping you feel your absolute best.'],
-  },
-  {
-    slug: 'curtis-parillon',
-    name: 'Curtis Parillon',
-    role: 'Stylist',
-    category: 'Hair',
-    specialties: ['Vibrant color', 'Dimensional color', 'Polished blowouts'],
-    bookingUrl: salonBooking,
-    imagePosition: '50% 22%',
-    bio: ['Curtis focuses on vibrant, dimensional color and smooth blowouts in a calm, considered appointment. He is Olaplex certified and keeps hair integrity central to both subtle changes and bold transformations.'],
   },
   {
     slug: 'samantha-deleon',

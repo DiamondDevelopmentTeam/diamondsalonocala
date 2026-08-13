@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { HomeHeroCarousel } from '../components/HomeHeroCarousel';
 import { ResponsiveImage } from '../components/ResponsiveImage';
 import { Reveal } from '../components/Reveal';
 import { TransformationComparison } from '../components/TransformationComparison';
@@ -27,43 +27,10 @@ const featuredTeam = ['brooke-bynum', 'careliz-torres', 'jasleen-herrera', 'sama
 const featuredGallery = [galleryImages[0], galleryImages[2], galleryImages[3], galleryImages[10], galleryImages[11]];
 
 export function Home() {
-  const heroMediaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let frame = 0;
-
-    const updateParallax = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        const shift = Math.min(window.scrollY * 0.045, 42);
-        heroMediaRef.current?.style.setProperty('--hero-shift', `${shift}px`);
-        frame = 0;
-      });
-    };
-
-    window.addEventListener('scroll', updateParallax, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', updateParallax);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
   return (
     <div className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
-        <div className="home-hero__media" ref={heroMediaRef}>
-          <ResponsiveImage
-            baseName="salon/ourspace5"
-            alt="Bright, open interior of Diamond Salon Ocala"
-            width={1600}
-            height={1200}
-            loading="eager"
-            fetchPriority="high"
-            sizes="100vw"
-          />
-          <span className="home-hero__image-caption">A modern beauty collective · Ocala, Florida</span>
-        </div>
+        <HomeHeroCarousel />
 
         <div className="home-hero__copy">
           <div>
