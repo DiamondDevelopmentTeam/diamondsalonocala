@@ -50,7 +50,7 @@ export function Home() {
   }, []);
 
   return (
-    <>
+    <div className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
         <div className="home-hero__media" ref={heroMediaRef}>
           <ResponsiveImage
@@ -67,7 +67,7 @@ export function Home() {
 
         <div className="home-hero__copy">
           <div>
-            <p className="eyebrow">Independent beauty professionals · Ocala</p>
+            <p className="eyebrow home-hero__eyebrow">Independent beauty professionals · Ocala</p>
             <h1 id="home-title">Beauty,<br /><em>shaped</em> around you.</h1>
             <p className="home-hero__lede">A modern salon collective for considered color, confident cuts, skin, nails, and finishing services—delivered by professionals who make the experience their own.</p>
             <div className="button-row">
@@ -171,7 +171,7 @@ export function Home() {
               <p className="eyebrow eyebrow--dark">Meet the collective</p>
               <h2>{teamMembers.length} professionals.<br />Your right fit is here.</h2>
             </div>
-            <p>Browse by specialty, get to know each professional, and follow the booking path that works for them.</p>
+            <p className="team-preview__description">Browse by specialty, get to know each professional, and follow the booking path that works for them.</p>
           </Reveal>
 
           <div className="team-preview__grid">
@@ -226,7 +226,7 @@ export function Home() {
           <Reveal>
             <p className="eyebrow">Giving back</p>
             <h2>Beauty has a place in community.</h2>
-            <p>Owner Veronica Lake and the Diamond Salon team are committed to supporting local families, children, and thoughtful community partnerships across Ocala.</p>
+            <p className="community-feature__description">Owner Veronica Lake and the Diamond Salon team are committed to supporting local families, children, and thoughtful community partnerships across Ocala.</p>
             <Link className="button button--line-light" to="/giving-back">Our community commitment</Link>
           </Reveal>
         </div>
@@ -261,10 +261,10 @@ export function Home() {
 
       <aside className="referral-strip" aria-label="Referral offer">
         <div className="container referral-strip__inner">
-          <p><span>Share the shine</span> Bring a friend or family member, and you can both enjoy $20 off your next service.</p>
+          <p className="referral-strip__message"><span>Share the shine</span> Bring a friend or family member, and you can both enjoy $20 off your next service.</p>
           <Link className="arrow-link arrow-link--light" to="/specials">View offer details <span aria-hidden="true">→</span></Link>
         </div>
       </aside>
-    </>
+    </div>
   );
 }
