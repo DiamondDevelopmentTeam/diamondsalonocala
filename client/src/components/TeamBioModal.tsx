@@ -8,6 +8,7 @@ type TeamBioModalProps = {
 };
 
 const ANIMATION_DURATION = 240;
+
 const focusableSelector = [
   'a[href]',
   'button:not([disabled])',
@@ -17,13 +18,41 @@ const focusableSelector = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
-export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
-  const [renderedMember, setRenderedMember] = useState<TeamMember | null>(member);
+/**
+ * Resolve an asset stored inside /public while respecting Vite's configured
+ * base path. This keeps the image working both locally and when the website
+ * is hosted under a GitHub Pages subdirectory.
+ */
+function getPublicAssetUrl(src: string) {
+  if (
+    src.startsWith('http://') ||
+    src.startsWith('https://') ||
+    src.startsWith('data:') ||
+    src.startsWith('blob:')
+  ) {
+    return src;
+  }
+
+  const cleanSrc = src.replace(/^\/+/, '');
+  const baseUrl = import.meta.env.BASE_URL || '/';
+
+  return `${baseUrl}${cleanSrc}`;
+}
+
+export function TeamBioModal({
+  member,
+  onClose,
+}: TeamBioModalProps) {
+  const [renderedMember, setRenderedMember] =
+    useState<TeamMember | null>(member);
+
   const [isVisible, setIsVisible] = useState(Boolean(member));
+
   const dialogRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const wasOpenRef = useRef(false);
+
   const titleId = useId();
   const bioId = useId();
 
@@ -35,11 +64,19 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
     if (member) {
       animationFrame = window.requestAnimationFrame(() => {
         setRenderedMember(member);
-        visibilityFrame = window.requestAnimationFrame(() => setIsVisible(true));
+
+        visibilityFrame = window.requestAnimationFrame(() => {
+          setIsVisible(true);
+        });
       });
     } else {
-      animationFrame = window.requestAnimationFrame(() => setIsVisible(false));
-      exitTimer = window.setTimeout(() => setRenderedMember(null), ANIMATION_DURATION + 16);
+      animationFrame = window.requestAnimationFrame(() => {
+        setIsVisible(false);
+      });
+
+      exitTimer = window.setTimeout(() => {
+        setRenderedMember(null);
+      }, ANIMATION_DURATION + 16);
     }
 
     return () => {
@@ -53,15 +90,24 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
     if (!member) {
       if (wasOpenRef.current) {
         const returnTarget = returnFocusRef.current;
-        window.requestAnimationFrame(() => returnTarget?.focus());
+
+        window.requestAnimationFrame(() => {
+          returnTarget?.focus();
+        });
+
         returnFocusRef.current = null;
         wasOpenRef.current = false;
       }
+
       return;
     }
 
     if (!wasOpenRef.current) {
-      returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      returnFocusRef.current =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+
       wasOpenRef.current = true;
     }
 
@@ -74,12 +120,22 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
         return;
       }
 
-      if (event.key !== 'Tab' || !dialogRef.current) return;
+      if (event.key !== 'Tab' || !dialogRef.current) {
+        return;
+      }
 
-      const focusableElements = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector))
-        .filter((element) => element.getAttribute('aria-hidden') !== 'true');
+      const focusableElements = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          focusableSelector,
+        ),
+      ).filter(
+        (element) =>
+          element.getAttribute('aria-hidden') !== 'true',
+      );
+
       const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
+      const lastElement =
+        focusableElements[focusableElements.length - 1];
 
       if (!firstElement || !lastElement) {
         event.preventDefault();
@@ -87,19 +143,28 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
         return;
       }
 
-      if (event.shiftKey && document.activeElement === firstElement) {
+      if (
+        event.shiftKey &&
+        document.activeElement === firstElement
+      ) {
         event.preventDefault();
         lastElement.focus();
-      } else if (!event.shiftKey && document.activeElement === lastElement) {
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === lastElement
+      ) {
         event.preventDefault();
         firstElement.focus();
-      } else if (!dialogRef.current.contains(document.activeElement)) {
+      } else if (
+        !dialogRef.current.contains(document.activeElement)
+      ) {
         event.preventDefault();
         firstElement.focus();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       document.body.classList.remove('team-modal-open');
       window.removeEventListener('keydown', handleKeyDown);
@@ -107,21 +172,35 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
   }, [member, onClose]);
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible) {
+      return;
+    }
+
     const firstFrame = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+      window.requestAnimationFrame(() => {
+        closeButtonRef.current?.focus();
+      });
     });
-    return () => window.cancelAnimationFrame(firstFrame);
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+    };
   }, [isVisible]);
 
-  if (!renderedMember) return null;
+  if (!renderedMember) {
+    return null;
+  }
 
   return (
     <div
-      className={`team-bio-modal${isVisible ? ' is-open' : ''}`}
+      className={`team-bio-modal${
+        isVisible ? ' is-open' : ''
+      }`}
       aria-hidden={!isVisible}
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
       }}
     >
       <article
@@ -152,14 +231,36 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
           </button>
 
           <header className="team-bio-modal__header">
-            {renderedMember.location ? <p className="team-bio-modal__location">{renderedMember.location}</p> : null}
-            <p className="team-bio-modal__role">{renderedMember.role}</p>
-            <h2 id={titleId}>{renderedMember.name}</h2>
-            {renderedMember.phoneDisplay && renderedMember.phoneHref ? (
-              <a className="team-bio-modal__phone" href={renderedMember.phoneHref} aria-label={`Call ${renderedMember.name} at ${renderedMember.phoneDisplay}`}>{renderedMember.phoneDisplay}</a>
+            {renderedMember.location ? (
+              <p className="team-bio-modal__location">
+                {renderedMember.location}
+              </p>
             ) : null}
-            <ul className="specialty-list" aria-label={`${renderedMember.name}'s specialties`}>
-              {renderedMember.specialties.map((specialty) => <li key={specialty}>{specialty}</li>)}
+
+            <p className="team-bio-modal__role">
+              {renderedMember.role}
+            </p>
+
+            <h2 id={titleId}>{renderedMember.name}</h2>
+
+            {renderedMember.phoneDisplay &&
+            renderedMember.phoneHref ? (
+              <a
+                className="team-bio-modal__phone"
+                href={renderedMember.phoneHref}
+                aria-label={`Call ${renderedMember.name} at ${renderedMember.phoneDisplay}`}
+              >
+                {renderedMember.phoneDisplay}
+              </a>
+            ) : null}
+
+            <ul
+              className="specialty-list"
+              aria-label={`${renderedMember.name}'s specialties`}
+            >
+              {renderedMember.specialties.map((specialty) => (
+                <li key={specialty}>{specialty}</li>
+              ))}
             </ul>
           </header>
 
@@ -169,8 +270,60 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
             tabIndex={0}
             aria-label={`Biography for ${renderedMember.name}`}
           >
-            {renderedMember.bioHeading ? <h3>{renderedMember.bioHeading}</h3> : null}
-            {renderedMember.bio.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            {renderedMember.bioHeading ? (
+              <h3>{renderedMember.bioHeading}</h3>
+            ) : null}
+
+            {renderedMember.bio.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+
+            {renderedMember.localizedBio?.map((section) => (
+              <section
+                className="team-bio-modal__localized"
+                lang="es"
+                key={section.heading}
+              >
+                <h3>{section.heading}</h3>
+
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </section>
+            ))}
+
+            {renderedMember.workImages?.length ? (
+              <section
+                className="team-bio-modal__work"
+                aria-label={`Selected work by ${renderedMember.name}`}
+              >
+                <div className="team-bio-modal__work-heading">
+                  <span aria-hidden="true" />
+
+                  <p>Selected Work</p>
+                </div>
+
+                <div className="team-bio-modal__work-grid">
+                  {renderedMember.workImages.map(
+                    (image, index) => (
+                      <figure
+                        className="team-bio-modal__work-item"
+                        key={`${image.src}-${index}`}
+                      >
+                        <img
+                          src={getPublicAssetUrl(image.src)}
+                          alt={image.alt}
+                          className="team-bio-modal__work-image"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </figure>
+                    ),
+                  )}
+                </div>
+              </section>
+            ) : null}
+
             <a
               className="button button--black team-bio-modal__booking"
               href={renderedMember.bookingUrl}
@@ -180,12 +333,6 @@ export function TeamBioModal({ member, onClose }: TeamBioModalProps) {
             >
               Book <span aria-hidden="true">↗</span>
             </a>
-            {renderedMember.localizedBio?.map((section) => (
-              <section className="team-bio-modal__localized" lang="es" key={section.heading}>
-                <h3>{section.heading}</h3>
-                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              </section>
-            ))}
           </div>
         </div>
       </article>

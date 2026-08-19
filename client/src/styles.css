@@ -819,3 +819,90 @@ address { font-style: normal; }
   .home-hero__slide, .home-hero__slide img { transition: none !important; transform: none !important; }
   .service-tabs__panel-inner { animation: none; }
 }
+
+/* -------------------------------------------------------
+   Team Profile - Selected Work
+------------------------------------------------------- */
+
+.team-bio-modal__work {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(18, 18, 18, 0.12);
+}
+
+.team-bio-modal__work-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.team-bio-modal__work-heading > span {
+  display: block;
+  width: 22px;
+  height: 1px;
+  flex: 0 0 22px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.team-bio-modal__work-heading p {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.team-bio-modal__work-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.team-bio-modal__work-item {
+  width: clamp(120px, 32%, 165px);
+  margin: 0;
+  overflow: hidden;
+  background: #f2f2f0;
+}
+
+.team-bio-modal__work-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center;
+  transition:
+    transform 260ms ease,
+    filter 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .team-bio-modal__work-item:hover .team-bio-modal__work-image {
+    transform: scale(1.035);
+  }
+}
+
+@media (max-width: 720px) {
+  .team-bio-modal__work {
+    margin-top: 1.6rem;
+    padding-top: 1.25rem;
+  }
+
+  .team-bio-modal__work-item {
+    width: min(46%, 145px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-bio-modal__work-image {
+    transition: none;
+  }
+
+  .team-bio-modal__work-item:hover .team-bio-modal__work-image {
+    transform: none;
+  }
+}
